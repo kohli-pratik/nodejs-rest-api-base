@@ -12,7 +12,7 @@ const fs = require('fs');
  */
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        callback(null, './data/');
+        callback(null, './uploadedFiles/');
     },
     filename: (req, file, callback) => {        
         (req.body.multipleVersion === 'true')
@@ -30,7 +30,7 @@ const fileFilter = (req, file, callback) => {
     if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
         if (req.body.multipleVersion === 'false') {
             // Valid file type, check if file already exists
-            const filePath = `./data/${file.originalname}`;
+            const filePath = `./uploadedFiles/${file.originalname}`;
             fs.access(filePath, fs.F_OK, (err) => {
                 (err)
                     ? callback(null, true) // File does not exists, Accept file

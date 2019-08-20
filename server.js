@@ -12,6 +12,7 @@ var express = require('express'),
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/TodoDB');
 
+app.use('/uploadedFiles', express.static('uploadedFiles'))
 /**
  * bodyParser parses incoming req bodies in a middleware before the handlers
  * available under the req.body property
