@@ -37,11 +37,29 @@ exports.getProduct = (req, res) => {
 };
 
 exports.updateProduct = (req, res) => {
-    Product.findByIdAndUpdate({ _id: req.params.productId }, (err, products) => {
+    Product.findById(req.params.productId, (err, product) => {
         if (err)
             res.send(err);
-        res.json(products);
-    })
+        if (product === null) {
+            res.json({ message: `No product with the id ${req.params.productId} exists` })
+        } else {
+            req.body.image = (req.file) ? req.file.path.replace('\\', '/') : product.image;
+            Product.findOneAndUpdate({ _id: req.params.productId }, req.body, { new: true, useFindAndModify: false }, (err, updatedProduct) => {
+                if (err)
+                    res.send(err);
+
+                // Delete old product image file
+                const filePath = `./${product.image}`;
+                try {
+                    fs.unlinkSync(filePath);
+                } catch (err) {
+                    res.send(err);
+                }
+
+                res.json(updatedProduct);
+            });
+        }
+    });
 };
 
 exports.deleteProduct = (req, res) => {
@@ -55,7 +73,7 @@ exports.deleteProduct = (req, res) => {
                 if (err)
                     res.send(err);
 
-                // Delet product image file
+                // Delete product image file
                 const filePath = `./${product.image}`;
                 try {
                     fs.unlinkSync(filePath);
@@ -79,7 +97,7 @@ exports.deleteAllProducts = (req, res) => {
                 if (err)
                     res.send(err);
 
-                // Delet all product image files
+                // Delete all product image files
                 const filePath = `./uploadedFiles`;
                 const productImages = fs.readdirSync(filePath);
                 try {
@@ -94,3 +112,12 @@ exports.deleteAllProducts = (req, res) => {
         }
     });
 };
+
+
+// // Valid file type, check if file already exists
+// const filePath = `./uploadedFiles/${file.originalname}`;
+// fs.access(filePath, fs.F_OK, (err) => {
+//     (err)
+//         ? callback(null, true) // File does not exists, Accept file
+//         : callback(new Error(`${file.originalname} already exists`), false); // File exists, Reject file
+// });

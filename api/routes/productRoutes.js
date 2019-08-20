@@ -10,6 +10,6 @@ module.exports = (app) => {
 
     app.route('/products/:productId')
         .get(productController.getProduct)
-        .put(uploadController.upload.single('productImage'), productController.updateProduct)
+        .put(uploadController.upload.single('updatedProductImage'), productController.updateProduct)
         .delete(productController.deleteProduct);
 }

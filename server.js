@@ -10,7 +10,7 @@ var express = require('express'),
  * mongoose instance connection - url connection
  */
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/TodoDB');
+mongoose.connect('mongodb://localhost/generalStorageDB', { useNewUrlParser: true });
 
 app.use('/uploadedFiles', express.static('uploadedFiles'))
 /**
@@ -39,4 +39,4 @@ app.use((req, res) => {
 
 app.listen(port);
 
-console.log(`todo lost RESTful API server started on: ${port}`);
+console.log(`RESTful API server started on: ${port}`);

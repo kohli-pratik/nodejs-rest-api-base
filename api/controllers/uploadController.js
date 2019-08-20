@@ -14,10 +14,8 @@ const storage = multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, './uploadedFiles/');
     },
-    filename: (req, file, callback) => {        
-        (req.body.multipleVersion === 'true')
-            ? callback(null, `${new Date().toISOString().replace(/:/g, '-')}_${file.originalname}`)
-            : callback(null, file.originalname)
+    filename: (req, file, callback) => {
+        callback(null, `${new Date().toISOString().replace(/:/g, '-')}_${file.originalname}`)
     }
 });
 
@@ -28,17 +26,7 @@ const fileSizeLimit = 1024 * 1024 * 5;
 
 const fileFilter = (req, file, callback) => {
     if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
-        if (req.body.multipleVersion === 'false') {
-            // Valid file type, check if file already exists
-            const filePath = `./uploadedFiles/${file.originalname}`;
-            fs.access(filePath, fs.F_OK, (err) => {
-                (err)
-                    ? callback(null, true) // File does not exists, Accept file
-                    : callback(new Error(`${file.originalname} already exists`), false); // File exists, Reject file
-            });
-        } else {
-            callback(null, true)
-        }
+        callback(null, true)
     } else {
         // Invalid file type, Reject file
         callback(new Error(`Invalid file type - ${file.mimetype}`), false);
