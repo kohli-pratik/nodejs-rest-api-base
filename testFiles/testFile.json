@@ -1,0 +1,20 @@
+{
+    "id": "12345-678-9011-0947",
+    "userData": [
+        {
+            "firstName": "Barry",
+            "lastName": "Allen",
+            "city": "Star City"
+        },
+        {
+            "firstName": "Clark",
+            "lastName": "Kent",
+            "city": "Smallville"
+        },
+        {
+            "firstName": "Bruce",
+            "lastName": "Wayne",
+            "city": "Gotham"
+        }
+    ]
+}
