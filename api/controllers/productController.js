@@ -41,6 +41,14 @@ exports.updateProduct = (req, res) => {
         if (err)
             res.send(err);
         if (product === null) {
+            // Delete the temp saved product image file
+            const filePath = `./${req.file.path.replace('\\', '/')}`;
+            try {
+                fs.unlinkSync(filePath);
+            } catch (err) {
+                res.send(err);
+            }
+
             res.json({ message: `No product with the id ${req.params.productId} exists` })
         } else {
             req.body.image = (req.file) ? req.file.path.replace('\\', '/') : product.image;
