@@ -2,6 +2,7 @@ var express = require('express'),
     app = express(),
     port = process.env.PORT || 3000,
     mongoose = require('mongoose'),
+    Category = require('./api/models/categoryModel'),
     Product = require('./api/models/productModel'), // loading the model
     bodyParser = require('body-parser');
 
@@ -23,7 +24,9 @@ app.use(bodyParser.json());
 /**
  * import and register routes in the server
  */
-var productRoutes = require('./api/routes/productRoutes');
+const categoryRoutes = require('./api/routes/categoryRoutes');
+const productRoutes = require('./api/routes/productRoutes');
+categoryRoutes(app);
 productRoutes(app);
 
 /**

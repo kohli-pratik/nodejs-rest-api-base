@@ -4,36 +4,45 @@ const fs = require('fs');
 const mongoose = require('mongoose'),
     Product = mongoose.model('Products');
 
-exports.addProduct = (req, res) => {
+exports.addProduct = async (req, res) => {
     const newProduct = new Product({
         name: req.body.name,
         price: req.body.price,
+        category: (req.body.category) ? req.body.category : null,
         images: (req.files) ? [...req.files.map(file => file.path.replace('\\', '/'))] : []
     });
 
-    newProduct.save((err, product) => {
-        if (err)
-            res.send(err);
+    try {
+        const product = await newProduct.save();
         res.json(product);
-    });
+    } catch (err) {
+        res.send(err);
+    }
 };
 
-exports.getAllProducts = (req, res) => {
-    Product.find({}, (err, products) => {
-        if (err)
-            res.send(err);
+exports.getAllProducts = async (req, res) => {
+    try {
+        const products = await Product
+            .find()
+            .populate('category', 'name');
         res.json(products);
-    })
-};
+    } catch (err) {
+        res.send(err);
+    }
+}
 
-exports.getProduct = (req, res) => {
-    Product.findById(req.params.productId, (err, product) => {
-        if (err)
-            res.send(err);
+exports.getProduct = async (req, res) => {
+    try {
+        const product = await Product
+            .findById(req.params.productId)
+            .populate('category', 'name');
+
         (product === null)
             ? res.json({ message: `No product with the id ${req.params.productId} exists` })
             : res.json(product);
-    })
+    } catch (err) {
+        res.send(err);
+    }
 };
 
 exports.updateProduct = (req, res) => {
@@ -68,56 +77,47 @@ exports.updateProduct = (req, res) => {
     });
 };
 
-exports.deleteProduct = (req, res) => {
-    Product.findById(req.params.productId, (err, product) => {
-        if (err)
-            res.send(err);
+exports.deleteProduct = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.productId)
+
         if (product === null) {
             res.json({ message: `No product with the id ${req.params.productId} exists` })
         } else {
-            Product.deleteOne({ _id: req.params.productId }, (err, operation) => {
-                if (err)
-                    res.send(err);
+            await Product.deleteOne({ _id: req.params.productId });
 
-                // Delete product image files
-                const deleteOperationResult = deleteFiles(product.images.map(image => `./${image}`));
-                (deleteOperationResult)
-                    ? res.json({ message: `Product ${req.params.productId} successfully deleted` })
-                    : res.send(deleteOperationResult);
-            })
+            // Delete product image files
+            const deleteOperationResult = deleteFiles(product.images.map(image => `./${image}`));
+            (deleteOperationResult)
+                ? res.json({ message: `Product ${req.params.productId} successfully deleted` })
+                : res.send(deleteOperationResult);
         }
-    })
+    } catch (err) {
+        res.send(err);
+    }
 };
 
-exports.deleteAllProducts = (req, res) => {
-    Product.find({}, (err, products) => {
-        if (err)
-            res.send(err);
+exports.deleteAllProducts = async (req, res) => {
+    try {
+        const products = await Product.find();
+
         if (products.length === 0) {
             res.json({ message: 'No products stored in the database' })
         } else {
-            Product.deleteMany({}, (err, operation) => {
-                if (err)
-                    res.send(err);
+            await Product.deleteMany();
 
-                // Delete all product image files
-                const filePath = `./uploadedFiles`;
-                const productImages = fs.readdirSync(filePath);
-                // try {
-                //     productImages.forEach((image) => {
-                //         fs.unlinkSync(`${filePath}/${image}`);
-                //     });
-                //     res.json({ message: `All products successfully deleted` });
-                // } catch (err) {
-                //     res.send(err);
-                // }
-                const deleteOperationResult = deleteFiles(productImages.map(image => `${filePath}/${image}`));
-                (deleteOperationResult)
-                    ? res.json({ message: `All products successfully deleted` })
-                    : res.send(deleteOperationResult);
-            })
+            // Delete all product image files
+            const filePath = `./uploadedFiles`;
+            const productImages = fs.readdirSync(filePath);
+
+            const deleteOperationResult = deleteFiles(productImages.map(image => `${filePath}/${image}`));
+            (deleteOperationResult)
+                ? res.json({ message: `All products successfully deleted` })
+                : res.send(deleteOperationResult);
         }
-    });
+    } catch (err) {
+        res.send(err);
+    }
 };
 
 let deleteFiles = (filePaths) => {

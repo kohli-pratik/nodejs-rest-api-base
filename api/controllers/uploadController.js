@@ -5,7 +5,6 @@
  * multer is used to handle multi-part form data
  */
 const multer = require('multer');
-const fs = require('fs');
 
 /**
  * Sets the file storage config

@@ -1,7 +1,8 @@
 'use strict';
+
 module.exports = (app) => {
-    var uploadController = require('../controllers/uploadController');
-    var productController = require('../controllers/productController');
+    const uploadController = require('../controllers/uploadController');
+    const productController = require('../controllers/productController');
 
     app.route('/products')
         .post(uploadController.upload.array('productImage'), productController.addProduct)
