@@ -8,7 +8,7 @@ exports.addProduct = (req, res) => {
     const newProduct = new Product({
         name: req.body.name,
         price: req.body.price,
-        image: (req.file) ? req.file.path.replace('\\', '/') : null
+        images: (req.files) ? [...req.files.map(file => file.path.replace('\\', '/'))] : []
     });
 
     newProduct.save((err, product) => {
@@ -42,29 +42,27 @@ exports.updateProduct = (req, res) => {
             res.send(err);
         if (product === null) {
             // Delete the temp saved product image file
-            const filePath = `./${req.file.path.replace('\\', '/')}`;
-            try {
-                fs.unlinkSync(filePath);
-            } catch (err) {
-                res.send(err);
-            }
+            const tempStoredImages = (req.files)
+                ? [...req.files.map(file => file.path.replace('\\', '/'))]
+                : [];
 
-            res.json({ message: `No product with the id ${req.params.productId} exists` })
+            const deleteOperationResult = deleteFiles(tempStoredImages.map(image => `./${image}`));
+            (deleteOperationResult)
+                ? res.json({ message: `No product with the id ${req.params.productId} exists` })
+                : res.send(deleteOperationResult);
         } else {
-            req.body.image = (req.file) ? req.file.path.replace('\\', '/') : product.image;
+            req.body.images = (req.files)
+                ? [...req.files.map(file => file.path.replace('\\', '/'))]
+                : product.images;
+
             Product.findOneAndUpdate({ _id: req.params.productId }, req.body, { new: true, useFindAndModify: false }, (err, updatedProduct) => {
                 if (err)
                     res.send(err);
 
-                // Delete old product image file
-                const filePath = `./${product.image}`;
-                try {
-                    fs.unlinkSync(filePath);
-                } catch (err) {
-                    res.send(err);
-                }
-
-                res.json(updatedProduct);
+                const deleteOperationResult = deleteFiles(product.images.map(image => `./${image}`));
+                (deleteOperationResult)
+                    ? res.json(updatedProduct)
+                    : res.send(deleteOperationResult);
             });
         }
     });
@@ -81,14 +79,11 @@ exports.deleteProduct = (req, res) => {
                 if (err)
                     res.send(err);
 
-                // Delete product image file
-                const filePath = `./${product.image}`;
-                try {
-                    fs.unlinkSync(filePath);
-                    res.json({ message: `Product ${req.params.productId} successfully deleted` });
-                } catch (err) {
-                    res.send(err);
-                }
+                // Delete product image files
+                const deleteOperationResult = deleteFiles(product.images.map(image => `./${image}`));
+                (deleteOperationResult)
+                    ? res.json({ message: `Product ${req.params.productId} successfully deleted` })
+                    : res.send(deleteOperationResult);
             })
         }
     })
@@ -108,18 +103,33 @@ exports.deleteAllProducts = (req, res) => {
                 // Delete all product image files
                 const filePath = `./uploadedFiles`;
                 const productImages = fs.readdirSync(filePath);
-                try {
-                    productImages.forEach((image) => {
-                        fs.unlinkSync(`${filePath}/${image}`);
-                    });
-                    res.json({ message: `All products successfully deleted` });
-                } catch (err) {
-                    res.send(err);
-                }
+                // try {
+                //     productImages.forEach((image) => {
+                //         fs.unlinkSync(`${filePath}/${image}`);
+                //     });
+                //     res.json({ message: `All products successfully deleted` });
+                // } catch (err) {
+                //     res.send(err);
+                // }
+                const deleteOperationResult = deleteFiles(productImages.map(image => `${filePath}/${image}`));
+                (deleteOperationResult)
+                    ? res.json({ message: `All products successfully deleted` })
+                    : res.send(deleteOperationResult);
             })
         }
     });
 };
+
+let deleteFiles = (filePaths) => {
+    filePaths.forEach((filePath) => {
+        try {
+            fs.unlinkSync(filePath);
+        } catch (err) {
+            return err;
+        }
+    });
+    return true;
+}
 
 
 // // Valid file type, check if file already exists

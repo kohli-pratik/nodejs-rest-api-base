@@ -4,12 +4,12 @@ module.exports = (app) => {
     var productController = require('../controllers/productController');
 
     app.route('/products')
-        .post(uploadController.upload.single('productImage'), productController.addProduct)
+        .post(uploadController.upload.array('productImage'), productController.addProduct)
         .get(productController.getAllProducts)
         .delete(productController.deleteAllProducts);
 
     app.route('/products/:productId')
         .get(productController.getProduct)
-        .put(uploadController.upload.single('updatedProductImage'), productController.updateProduct)
+        .put(uploadController.upload.array('updatedProductImage'), productController.updateProduct)
         .delete(productController.deleteProduct);
 }

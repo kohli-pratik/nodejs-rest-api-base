@@ -2,7 +2,6 @@ var express = require('express'),
     app = express(),
     port = process.env.PORT || 3000,
     mongoose = require('mongoose'),
-    Task = require('./api/models/todoListModel'), // loading the model
     Product = require('./api/models/productModel'), // loading the model
     bodyParser = require('body-parser');
 
@@ -24,9 +23,7 @@ app.use(bodyParser.json());
 /**
  * import and register routes in the server
  */
-var todoListRoutes = require('./api/routes/todoListRoutes');
 var productRoutes = require('./api/routes/productRoutes');
-todoListRoutes(app);
 productRoutes(app);
 
 /**
