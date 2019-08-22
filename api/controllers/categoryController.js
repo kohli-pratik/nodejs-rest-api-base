@@ -3,35 +3,36 @@
 const mongoose = require('mongoose');
 const Category = mongoose.model('Categories');
 
-exports.createCategory = (req, res) => {
-    const newCategory = new Category({
-        name: req.body.name
-    });
+exports.createCategory = async (req, res) => {
+    try {
+        const newCategory = new Category({
+            name: req.body.name
+        });
 
-    newCategory.save((err, category) => {
-        if (err)
-            res.send(err);
-
+        const category = await newCategory.save();
         res.json(category);
-    });
+    } catch (err) {
+        res.send(err);
+    }
 };
 
-exports.getAllCategories = (req, res) => {
-    Category.find({}, (err, categories) => {
-        if (err)
-            res.send(err);
-
+exports.getAllCategories = async (req, res) => {
+    try {
+        const categories = await Category.find({});
         res.json(categories);
-    });
+    } catch (err) {
+        res.send(err);
+    }
 };
 
-exports.getCategory = (req, res) => {
-    Category.findById(req.params.categoryId, (err, category) => {
-        if (err)
-            res.send(err);
-
+exports.getCategory = async (req, res) => {
+    try {
+        const category = await Category.findById(req.params.categoryId);
         (category === null)
             ? res.json({ message: `Category with id ${req.params.categoryId} does not exist` })
             : res.json(category);
-    });
+
+    } catch (err) {
+        res.send(err);
+    }
 };
