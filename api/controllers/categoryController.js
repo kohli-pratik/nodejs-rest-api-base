@@ -31,7 +31,17 @@ exports.getCategory = async (req, res) => {
         (category === null)
             ? res.json({ message: `Category with id ${req.params.categoryId} does not exist` })
             : res.json(category);
+    } catch (err) {
+        res.send(err);
+    }
+};
 
+exports.deleteAllCategories = async (req, res) => {
+    try {
+        const deleteOperationResult = await Category.deleteMany();
+        (deleteOperationResult.deletedCount === 0)
+            ? res.json({ message: 'No categories stored in the database' })
+            : res.json({ message: 'All categories successfully deleted' });
     } catch (err) {
         res.send(err);
     }

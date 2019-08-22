@@ -2,7 +2,7 @@ var express = require('express'),
     app = express(),
     port = process.env.PORT || 3000,
     mongoose = require('mongoose'),
-    Category = require('./api/models/categoryModel'),
+    Category = require('./api/models/categoryModel'), // loading the model
     Product = require('./api/models/productModel'), // loading the model
     bodyParser = require('body-parser');
 

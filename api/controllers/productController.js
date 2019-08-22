@@ -20,6 +20,20 @@ exports.addProduct = async (req, res) => {
     }
 };
 
+exports.getProduct = async (req, res) => {
+    try {
+        const product = await Product
+            .findById(req.params.productId)
+            .populate('category', 'name');
+
+        (product === null)
+            ? res.json({ message: `No product with the id ${req.params.productId} exists` })
+            : res.json(product);
+    } catch (err) {
+        res.send(err);
+    }
+};
+
 exports.getAllProducts = async (req, res) => {
     try {
         const products = await Product
@@ -31,15 +45,44 @@ exports.getAllProducts = async (req, res) => {
     }
 }
 
-exports.getProduct = async (req, res) => {
+exports.getAllProductsFiltered = async (req, res) => {
     try {
-        const product = await Product
-            .findById(req.params.productId)
-            .populate('category', 'name');
+        const { filterName } = req.body;
+        let conditions = [];
 
-        (product === null)
-            ? res.json({ message: `No product with the id ${req.params.productId} exists` })
-            : res.json(product);
+        switch (filterName) {
+            case 'category':
+                conditions = { $or: req.body.categories.split(',').map(category => { return { [filterName]: category } }) };
+                break;
+            case 'price':
+                const minPrice = (req.body.minPrice) ? parseFloat(req.body.minPrice) : 0;
+                const maxPrice = (req.body.maxPrice) ? parseFloat(req.body.maxPrice) : 0;
+                conditions = { price: { $lt: maxPrice, $gt: minPrice } };
+                break;
+        }
+        const filteredProducts = await Product.find(conditions);
+        res.json(filteredProducts);
+    } catch (err) {
+        res.send(err);
+    }
+};
+
+exports.getAllProductsSorted = async (req, res) => {
+    try {
+        const { sortName } = req.body;
+        let sortedProducts = {};
+        switch (sortName) {
+            case 'price-asc':
+                sortedProducts = await Product.find({}).sort('price');
+                break;
+            case 'price-desc':
+                sortedProducts = await Product.find({}).sort('-price');
+                break;
+            default:
+                sortedProducts = await Product.find({});
+                break;
+        }
+        res.json(sortedProducts);
     } catch (err) {
         res.send(err);
     }
@@ -99,21 +142,19 @@ exports.deleteProduct = async (req, res) => {
 
 exports.deleteAllProducts = async (req, res) => {
     try {
-        const products = await Product.find();
+        const deleteOperationResult = await Product.deleteMany();
+        if (deleteOperationResult.deletedCount === 0) {
 
-        if (products.length === 0) {
             res.json({ message: 'No products stored in the database' })
         } else {
-            await Product.deleteMany();
-
             // Delete all product image files
             const filePath = `./uploadedFiles`;
             const productImages = fs.readdirSync(filePath);
 
-            const deleteOperationResult = deleteFiles(productImages.map(image => `${filePath}/${image}`));
-            (deleteOperationResult)
+            const deleteFilesResult = deleteFiles(productImages.map(image => `${filePath}/${image}`));
+            (deleteFilesResult)
                 ? res.json({ message: `All products successfully deleted` })
-                : res.send(deleteOperationResult);
+                : res.send(deleteFilesResult);
         }
     } catch (err) {
         res.send(err);
