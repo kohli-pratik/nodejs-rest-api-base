@@ -1,6 +1,7 @@
 # REST API Base using NodeJS and MongoDB
 
 **What does it do?**
+
 Uses a very simple example of a products catelog to provide examples of the following
 * API implementation to perform CRUD operations
     * On Update and Delete, remove the appropriate files in the directory.
