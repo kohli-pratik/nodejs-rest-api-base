@@ -1,7 +1,7 @@
 'use strict';
 
-const mongoose = require('mongoose');
-const Category = mongoose.model('Categories');
+const mongoose = require('mongoose'),
+    Category = mongoose.model('Categories');
 
 exports.createCategory = async (req, res) => {
     try {
