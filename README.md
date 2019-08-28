@@ -18,4 +18,4 @@ Uses a very simple example of a products catelog to provide examples of the foll
     * Sort as per the sort condition passed in the body.
 * User authentication using JWT tokens
 * API lockdown as per user permissions
-* Users checked to prevent a user from manupilating another user's data unless the requester has Admin level access.
+* Request checks to prevent a user from manupilating another user's data unless the requester has Admin level access.
