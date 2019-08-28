@@ -88,11 +88,11 @@ exports.getAllProductsSorted = async (req, res) => {
     }
 };
 
-exports.updateProduct = (req, res) => {
-    Product.findById(req.params.productId, (err, product) => {
-        if (err)
-            res.send(err);
-        if (product === null) {
+exports.updateProduct = async (req, res) => {
+    try {
+        const currentProduct = await Product.findById(req.params.productId);
+
+        if (currentProduct === null) {
             // Delete the temp saved product image file
             const tempStoredImages = (req.files)
                 ? [...req.files.map(file => file.path.replace('\\', '/'))]
@@ -105,35 +105,30 @@ exports.updateProduct = (req, res) => {
         } else {
             req.body.images = (req.files)
                 ? [...req.files.map(file => file.path.replace('\\', '/'))]
-                : product.images;
+                : currentProduct.images;
 
-            Product.findOneAndUpdate({ _id: req.params.productId }, req.body, { new: true, useFindAndModify: false }, (err, updatedProduct) => {
-                if (err)
-                    res.send(err);
-
-                const deleteOperationResult = deleteFiles(product.images.map(image => `./${image}`));
-                (deleteOperationResult)
-                    ? res.json(updatedProduct)
-                    : res.send(deleteOperationResult);
-            });
+            const updatedProduct = await Product.findOneAndUpdate({ _id: req.params.productId }, req.body, { new: true, useFindAndModify: false });
+            const deleteOperationResult = deleteFiles(currentProduct.images.map(image => `./${image}`));
+            (deleteOperationResult)
+                ? res.json(updatedProduct)
+                : res.send(deleteOperationResult);
         }
-    });
+    } catch (err) {
+        res.send(err);
+    }
 };
 
 exports.deleteProduct = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.productId)
-
-        if (product === null) {
-            res.json({ message: `No product with the id ${req.params.productId} exists` })
+        const deleteResult = await Product.deleteOne({ _id: req.params.productId });
+        if (deleteResult.deletedCount === 0) {
+            res.status(404).json({ message: `Product with id ${req.params.userId} does not exist` })
         } else {
-            await Product.deleteOne({ _id: req.params.productId });
-
             // Delete product image files
-            const deleteOperationResult = deleteFiles(product.images.map(image => `./${image}`));
-            (deleteOperationResult)
+            const deleteFileResult = deleteFiles(product.images.map(image => `./${image}`));
+            (deleteFileResult)
                 ? res.json({ message: `Product ${req.params.productId} successfully deleted` })
-                : res.send(deleteOperationResult);
+                : res.send(deleteFileResult);
         }
     } catch (err) {
         res.send(err);

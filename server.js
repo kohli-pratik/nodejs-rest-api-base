@@ -4,6 +4,7 @@ var express = require('express'),
     mongoose = require('mongoose'),
     Category = require('./api/models/categoryModel'), // loading the model
     Product = require('./api/models/productModel'), // loading the model
+    User = require('./api/models/userModel'), // loading the model
     bodyParser = require('body-parser');
 
 /**
@@ -26,8 +27,12 @@ app.use(bodyParser.json());
  */
 const categoryRoutes = require('./api/routes/categoryRoutes');
 const productRoutes = require('./api/routes/productRoutes');
+const userRoutes = require('./api/routes/userRoutes');
+const authenticationRoutes = require('./api/routes/authenticationRoutes');
 categoryRoutes(app);
 productRoutes(app);
+userRoutes(app);
+authenticationRoutes(app);
 
 /**
  * Handle wrong route calls
