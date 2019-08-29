@@ -2,8 +2,7 @@
 
 const mongoose = require('mongoose'),
     User = mongoose.model('Users'),
-    crypto = require('crypto'),
-    Contants = require('../utils/constants');
+    crypto = require('crypto');
 
 exports.validateFields = (req, res, next) => {
     if (!req.body.email && !req.body.password) {
@@ -28,9 +27,9 @@ exports.validateCredentials = async (req, res, next) => {
         if (user[0] === null) {
             res.status(404).json({ message: `No user found with email - ${req.body.email}` });
         } else {
-            let password = user[0].password.split('$');
-            let salt = password[0];
-            let hash = crypto.createHmac('sha512', salt).update(req.body.password).digest('base64');
+            const password = user[0].password.split('$');
+            const salt = password[0];
+            const hash = crypto.createHmac('sha512', salt).update(req.body.password).digest('base64');
             if (hash !== password[1]) {
                 return res.status(400).json({ error: 'Invalid email or password' });
             } else {

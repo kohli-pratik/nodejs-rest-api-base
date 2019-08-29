@@ -74,9 +74,9 @@ exports.deleteUser = async (req, res) => {
     }
 };
 
-let hashPassword = (password) => {
-    let salt = crypto.randomBytes(16).toString('base64');
-    let hash = crypto.createHmac('sha512', salt)
+const hashPassword = (password) => {
+    const salt = crypto.randomBytes(16).toString('base64');
+    const hash = crypto.createHmac('sha512', salt)
         .update(password)
         .digest('base64');
 

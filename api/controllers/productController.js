@@ -156,7 +156,7 @@ exports.deleteAllProducts = async (req, res) => {
     }
 };
 
-let deleteFiles = (filePaths) => {
+const deleteFiles = (filePaths) => {
     filePaths.forEach((filePath) => {
         try {
             fs.unlinkSync(filePath);

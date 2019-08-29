@@ -3,17 +3,27 @@
 const jwt = require('jsonwebtoken'),
     crypto = require('crypto'),
     Constants = require('../utils/constants'),
-    jwtSecret = Constants.jwtSecret;
+    jwtSecret = Constants.jwtSecret,
+    jwtOptions = {
+        expiresIn: '1h' // Numbers interpreted as seconds, String as ms unless the time unit (days, hours) is specified
+    };
 
+/**
+ * Salt - random data used as a password in the function that hashes data
+ * HMAC - Hashed Message Authentication Code
+ * Type of message authentication code that involves a hashing function and secret key
+ * Used to verify the intergrity of the hashed data
+ * HMAC are not decrypted, hashes are matched to determine if the hashed data is untampered
+ */
 exports.authenticate = async (req, res) => {
     try {
         const refreshId = `${req.body.userId}${jwtSecret}`;
-        let salt = crypto.randomBytes(16).toString('base64');
-        let hash = crypto.createHmac('sha512', salt).update(refreshId).digest('base64');
+        const salt = crypto.randomBytes(16).toString('base64');
+        const hash = crypto.createHmac('sha512', salt).update(refreshId).digest('base64');
         req.body.refreshKey = salt;
-        let token = jwt.sign(req.body, jwtSecret);
-        let buffer = new Buffer(hash);
-        let refreshTkn = buffer.toString('base64');
+        const token = jwt.sign(req.body, jwtSecret, jwtOptions);
+        const buffer = Buffer.fron(hash);
+        const refreshTkn = buffer.toString('base64');
         res.status(201).json({
             accessToken: token,
             refreshToken: refreshTkn
