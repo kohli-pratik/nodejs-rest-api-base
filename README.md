@@ -18,4 +18,18 @@ Uses a very simple example of a products catelog to provide examples of the foll
     * Sort as per the sort condition passed in the body.
 * User authentication using JWT tokens
 * API lockdown as per user permissions
-* Request checks to prevent a user from manupilating another user's data unless the requester has Admin level access.
+* Request checks to prevent a user from reading, updating or deleting another user's data unless the requester has Admin level access.
+
+**Before Using**
+
+Make sure that you have the following:
+* Node.js installed (https://nodejs.org/)
+* Mongodb installed and running locally (https://www.mongodb.com/)
+
+**Usage**
+
+To run the project locally, perform the following using the command line
+* Navigate to the project folder
+* If running for the 1st time, install dependencies using ```npm install```
+* Use this command - ```npm start```
+    * It will run the server on port 3000
