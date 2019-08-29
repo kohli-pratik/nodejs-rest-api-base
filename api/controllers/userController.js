@@ -36,7 +36,6 @@ exports.getAllUsers = async (req, res) => {
 exports.getSingleUser = async (req, res) => {
     try {
         const user = await User.findById({ _id: req.params.userId });
-        console.log('Current User', req.jwt);
         (user === null)
             ? res.status(404).json({ message: `User with id ${req.params.userId} does not exist` })
             : (user._id !== req.jwt.userId && parseInt(req.jwt.permissionLevel) !== Constants.permissionLevels.ADMIN)

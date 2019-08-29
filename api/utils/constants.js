@@ -4,7 +4,7 @@ const Constants = {
         PAID: 2,
         ADMIN: 3
     },
-    jwtSecret: 'myS33!!creeeT',
+    jwtSecret: 'myS33!!creeeT', // In production, store in enviroment variable
 };
 
 module.exports = Constants;
