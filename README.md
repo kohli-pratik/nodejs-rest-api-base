@@ -1,6 +1,6 @@
 # REST API Base using NodeJS and MongoDB
 
-**What does it do?**
+### What does it do?
 
 Uses a very simple example of a products catelog to provide examples of the following
 * API implementation to perform CRUD operations
@@ -20,13 +20,13 @@ Uses a very simple example of a products catelog to provide examples of the foll
 * API lockdown as per user permissions
 * Request checks to prevent a user from reading, updating or deleting another user's data unless the requester has Admin level access.
 
-**Before Using**
+### Before Using
 
 Make sure that you have the following:
 * Node.js installed (https://nodejs.org/)
 * Mongodb installed and running locally (https://www.mongodb.com/)
 
-**Usage**
+### Usage
 
 To run the project locally, perform the following using the command line
 * Navigate to the project folder
