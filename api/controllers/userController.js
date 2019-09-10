@@ -27,7 +27,9 @@ exports.getAllUsers = async (req, res) => {
         const users = await User.find({});
         (users === [])
             ? res.status(404).json({ message: `No users stored in the database` })
-            : res.json(users);
+            : (parseInt(req.jwt.permissionLevel) !== Constants.permissionLevels.ADMIN)
+                ? res.status(403).send()
+                : res.json(users);
     } catch (err) {
         res.send(err);
     }
@@ -38,7 +40,7 @@ exports.getSingleUser = async (req, res) => {
         const user = await User.findById({ _id: req.params.userId });
         (user === null)
             ? res.status(404).json({ message: `User with id ${req.params.userId} does not exist` })
-            : (user._id !== req.jwt.userId && parseInt(req.jwt.permissionLevel) !== Constants.permissionLevels.ADMIN)
+            : (user._id != req.jwt.userId)
                 ? res.status(403).send()
                 : res.json(user);
     } catch (err) {

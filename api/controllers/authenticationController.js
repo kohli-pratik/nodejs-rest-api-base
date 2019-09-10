@@ -22,7 +22,7 @@ exports.authenticate = async (req, res) => {
         const hash = crypto.createHmac('sha512', salt).update(refreshId).digest('base64');
         req.body.refreshKey = salt;
         const token = jwt.sign(req.body, jwtSecret, jwtOptions);
-        const buffer = Buffer.fron(hash);
+        const buffer = Buffer.from(hash);
         const refreshTkn = buffer.toString('base64');
         res.status(201).json({
             accessToken: token,
