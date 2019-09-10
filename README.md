@@ -19,6 +19,7 @@ Uses a very simple example of a products catelog to provide examples of the foll
 * User authentication using JWT tokens
 * API lockdown as per user permissions
 * Request checks to prevent a user from reading, updating or deleting another user's data unless the requester has Admin level access.
+* Unit testing using Jest to ensure the APIs function as expected given the input and permission level.
 
 ### Before Using
 
