@@ -9,5 +9,6 @@ module.exports = (app) => {
         .delete(categoryController.deleteAllCategories);
 
     app.route('/categories/:categoryId')
-        .get(categoryController.getCategory);
+        .get(categoryController.getCategory)
+        .delete(categoryController.deleteCategory);
 };

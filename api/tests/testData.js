@@ -21,7 +21,11 @@ const testData = {
             password: 'p@$$w0rd',
             permissionLevel: 3
         }
-    ]
+    ],
+    category: {
+    },
+    product: {
+    }
 }
 
 module.exports = testData;

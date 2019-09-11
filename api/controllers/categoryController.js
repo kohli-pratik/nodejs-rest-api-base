@@ -36,6 +36,17 @@ exports.getCategory = async (req, res) => {
     }
 };
 
+exports.deleteCategory = async (req, res) => {
+    try {
+        const deleteResult = await Category.deleteOne({ _id: req.params.categoryId });
+        (deleteResult.deletedCount === 0)
+            ? res.status(404).json({ message: `Category with id ${req.params.userId} does not exist` })
+            : res.json({ message: `Category with id ${req.params.userId} successfully deleted` });
+    } catch (err) {
+        res.send(err);
+    }
+};
+
 exports.deleteAllCategories = async (req, res) => {
     try {
         const deleteOperationResult = await Category.deleteMany();

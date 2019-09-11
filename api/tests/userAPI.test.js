@@ -3,14 +3,12 @@ const mongoose = require('mongoose'),
     request = require('supertest'),
     app = require('../../app'),
     testUsers = require('./testData').users,
-    Constants = require('../utils/constants');
+    Constants = require('../utils/constants'),
+    dropCollections = require('./commonMethods').dropCollections;
 
 describe('Testing User API Calls', () => {
     afterAll(done => {
-        const collections = mongoose.connection.collections;
-        Object.keys(collections).forEach(key => {
-            mongoose.connection.dropCollection(key, () => { });
-        });
+        dropCollections(mongoose);
         done();
     });
 
