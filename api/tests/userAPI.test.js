@@ -1,18 +1,18 @@
 
-const mongoose = require('mongoose'),
-    request = require('supertest'),
-    app = require('../../app'),
-    testUsers = require('./testData').users,
-    Constants = require('../utils/constants'),
-    dropCollections = require('./commonMethods').dropCollections;
+const mongoose = require('mongoose');
+const request = require('supertest');
+const app = require('../../app');
+const testUsers = require('./testData').users;
+const Constants = require('../utils/constants');
+const dropCollections = require('./commonMethods').dropCollections;
 
 describe('Testing User API Calls', () => {
-    afterAll(done => {
+    afterAll((done) => {
         dropCollections(mongoose);
         done();
     });
 
-    testUsers.forEach(testUser => {
+    testUsers.forEach((testUser) => {
         let testUserId = '';
         let testAccessToken = '';
 
@@ -61,7 +61,7 @@ describe('Testing User API Calls', () => {
                 if (testUser.permissionLevel === Constants.permissionLevels.ADMIN) {
                     expect.assertions(2);
                     expect(response.statusCode).toEqual(200);
-                    expect(response.body).toBeInstanceOf(Array)
+                    expect(response.body).toBeInstanceOf(Array);
                 } else {
                     expect.assertions(1);
                     expect(response.statusCode).toEqual(403);
@@ -88,9 +88,11 @@ describe('Testing User API Calls', () => {
                 const response = await request(app)
                     .delete(`/users/${testUserId}`)
                     .set('Authorization', `Bearer ${testAccessToken}`);
-                (testUser.permissionLevel === Constants.permissionLevels.ADMIN)
-                    ? expect(response.statusCode).toEqual(200)
-                    : expect(response.statusCode).toEqual(403);
+                if (testUser.permissionLevel === Constants.permissionLevels.ADMIN) {
+                    expect(response.statusCode).toEqual(200);
+                } else {
+                    expect(response.statusCode).toEqual(403);
+                }
                 done();
             });
         });

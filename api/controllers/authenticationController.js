@@ -1,12 +1,11 @@
-'use strict';
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const Constants = require('../utils/constants');
 
-const jwt = require('jsonwebtoken'),
-    crypto = require('crypto'),
-    Constants = require('../utils/constants'),
-    jwtSecret = Constants.jwtSecret,
-    jwtOptions = {
-        expiresIn: '1h' // Numbers interpreted as seconds, String as ms unless the time unit (days, hours) is specified
-    };
+const jwtSecret = Constants.jwtSecret;
+const jwtOptions = {
+    expiresIn: '1h', // Numbers interpreted as seconds, String as ms unless the time unit (days, hours) is specified
+};
 
 /**
  * Salt - random data used as a password in the function that hashes data
@@ -26,7 +25,7 @@ exports.authenticate = async (req, res) => {
         const refreshTkn = buffer.toString('base64');
         res.status(201).json({
             accessToken: token,
-            refreshToken: refreshTkn
+            refreshToken: refreshTkn,
         });
     } catch (err) {
         res.status(500).send(err);

@@ -1,15 +1,26 @@
-'use strict';
-
 const fs = require('fs');
-const mongoose = require('mongoose'),
-    Product = mongoose.model('Products');
+const mongoose = require('mongoose');
+
+const Product = mongoose.model('Products');
+
+const deleteFiles = async (filePaths) => {
+    filePaths.forEach((filePath) => {
+        try {
+            fs.unlinkSync(filePath);
+        } catch (err) {
+            return err;
+        }
+        return true;
+    });
+    return true;
+};
 
 exports.addProduct = async (req, res) => {
     const newProduct = new Product({
         name: req.body.name,
         price: req.body.price,
         category: (req.body.category) ? req.body.category : null,
-        images: (req.files) ? [...req.files.map(file => file.path.replace('\\', '/'))] : []
+        images: (req.files) ? [...req.files.map((file) => file.path.replace('\\', '/'))] : [],
     });
 
     try {
@@ -26,9 +37,11 @@ exports.getProduct = async (req, res) => {
             .findById(req.params.productId)
             .populate('category', 'name');
 
-        (product === null)
-            ? res.status(404).json({ message: `No product with the id ${req.params.productId} exists` })
-            : res.status(200).json(product);
+        if (product === null) {
+            res.status(404).json({ message: `No product with the id ${req.params.productId} exists` });
+        } else {
+            res.status(200).json(product);
+        }
     } catch (err) {
         res.status(500).send(err);
     }
@@ -43,27 +56,29 @@ exports.getAllProducts = async (req, res) => {
     } catch (err) {
         res.status(500).send(err);
     }
-}
+};
 
 exports.getAllProductsFiltered = async (req, res) => {
     try {
         const { filterName } = req.body;
         let conditions = {};
+        let minPrice;
+        let maxPrice;
 
         switch (filterName) {
             case 'category':
-                conditions = { $or: req.body.categories.split(',').map(category => { return { [filterName]: category } }) };
+                conditions = { $or: req.body.categories.split(',').map((category) => ({ [filterName]: category })) };
                 break;
             case 'price':
-                const minPrice = (req.body.minPrice) ? parseFloat(req.body.minPrice) : 0;
-                const maxPrice = (req.body.maxPrice) ? parseFloat(req.body.maxPrice) : 0;
+                minPrice = (req.body.minPrice) ? parseFloat(req.body.minPrice) : 0;
+                maxPrice = (req.body.maxPrice) ? parseFloat(req.body.maxPrice) : 0;
                 conditions = { price: { $lt: maxPrice, $gt: minPrice } };
                 break;
+            default:
         }
         const filteredProducts = await Product.find(conditions);
         res.status(200).json(filteredProducts);
     } catch (err) {
-        console.log('TEST', err);
         res.status(500).send(err);
     }
 };
@@ -96,26 +111,31 @@ exports.updateProduct = async (req, res) => {
         if (currentProduct === null) {
             // Delete the temp saved product image file
             const tempStoredImages = (req.files)
-                ? [...req.files.map(file => file.path.replace('\\', '/'))]
+                ? [...req.files.map((file) => file.path.replace('\\', '/'))]
                 : [];
 
-            const deleteOperationResult = deleteFiles(tempStoredImages.map(image => `./${image}`));
-            (deleteOperationResult)
-                ? res.status(404).json({ message: `No product with the id ${req.params.productId} exists` })
-                : res.status(500).send(deleteOperationResult);
+            const deleteOperationResult = await deleteFiles(tempStoredImages.map((image) => `./${image}`));
+            if (deleteOperationResult) {
+                res.status(404).json({ message: `No product with the id ${req.params.productId} exists` });
+            } else {
+                res.status(500).send(deleteOperationResult);
+            }
         } else {
             req.body.images = (req.files)
-                ? [...req.files.map(file => file.path.replace('\\', '/'))]
+                ? [...req.files.map((file) => file.path.replace('\\', '/'))]
                 : currentProduct.images;
 
-            const updatedProduct = await Product.findOneAndUpdate({ _id: req.params.productId }, req.body, { new: true, useFindAndModify: false });
-            const deleteOperationResult = deleteFiles(currentProduct.images.map(image => `./${image}`));
-            (deleteOperationResult)
-                ? res.status(200).json(updatedProduct)
-                : res.status(500).send(deleteOperationResult);
+            const updatedProduct = await Product.findOneAndUpdate({ _id: req.params.productId },
+                req.body, { new: true, useFindAndModify: false });
+            const deleteOperationResult = await deleteFiles(currentProduct.images.map((image) => `./${image}`));
+            if (deleteOperationResult) {
+                res.status(200).json(updatedProduct);
+            } else {
+                res.status(500).send(deleteOperationResult);
+            }
         }
     } catch (err) {
-        res.send(err);
+        res.status(500).send(err);
     }
 };
 
@@ -127,14 +147,15 @@ exports.deleteProduct = async (req, res) => {
         } else {
             await Product.deleteOne({ _id: req.params.productId });
             // Delete product image files
-            const deleteFileResult = await deleteFiles(product.images.map(image => `./${image}`));
-            (deleteFileResult)
-                ? res.status(200).json({ message: `Product ${req.params.productId} successfully deleted` })
-                : res.status(500).send(deleteFileResult);
+            const deleteFileResult = await deleteFiles(product.images.map((image) => `./${image}`));
+            if (deleteFileResult) {
+                res.status(200).json({ message: `Product ${req.params.productId} successfully deleted` });
+            } else {
+                res.status(500).send(deleteFileResult);
+            }
         }
-
     } catch (err) {
-        res.send(err);
+        res.status(500).send(err);
     }
 };
 
@@ -142,38 +163,29 @@ exports.deleteAllProducts = async (req, res) => {
     try {
         const deleteOperationResult = await Product.deleteMany();
         if (deleteOperationResult.deletedCount === 0) {
-            res.status(404).json({ message: 'No products stored in the database' })
+            res.status(404).json({ message: 'No products stored in the database' });
         } else {
             // Delete all product image files
-            const filePath = `./uploadedFiles`;
+            const filePath = './uploadedFiles';
             const productImages = fs.readdirSync(filePath);
 
-            const deleteFilesResult = await deleteFiles(productImages.map(image => `${filePath}/${image}`));
-            (deleteFilesResult)
-                ? res.status(200).json({ message: 'All products successfully deleted' })
-                : res.status(500).send(deleteFilesResult);
+            const deleteFilesResult = await deleteFiles(productImages.map((image) => `${filePath}/${image}`));
+            if (deleteFilesResult) {
+                res.status(200).json({ message: 'All products successfully deleted' });
+            } else {
+                res.status(500).send(deleteFilesResult);
+            }
         }
     } catch (err) {
-        res.send(err);
+        res.status(500).send(err);
     }
 };
-
-const deleteFiles = async (filePaths) => {
-    filePaths.forEach((filePath) => {
-        try {
-            fs.unlinkSync(filePath);
-        } catch (err) {
-            return err;
-        }
-    });
-    return true;
-}
-
 
 // // Valid file type, check if file already exists
 // const filePath = `./uploadedFiles/${file.originalname}`;
 // fs.access(filePath, fs.F_OK, (err) => {
 //     (err)
 //         ? callback(null, true) // File does not exists, Accept file
-//         : callback(new Error(`${file.originalname} already exists`), false); // File exists, Reject file
+//         : callback(new Error(`${file.originalname} already exists`),
+// false); // File exists, Reject file
 // });

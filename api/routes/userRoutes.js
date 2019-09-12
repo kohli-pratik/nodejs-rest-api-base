@@ -1,17 +1,13 @@
-'use strict';
-
 const Constants = require('../utils/constants');
+const userController = require('../controllers/userController');
+const userMiddleware = require('../middlewares/verifyUserMiddleware');
+const permissionMiddleware = require('../middlewares/verifyPermissionsMiddleware');
+const authenticationMiddleware = require('../middlewares/validateAuthMiddleware');
 
 module.exports = (app) => {
-    const userController = require('../controllers/userController');
-    const userMiddleware = require('../middlewares/verifyUserMiddleware');
-    const permissionMiddleware = require('../middlewares/verifyPermissionsMiddleware');
-    const authenticationMiddleware = require('../middlewares/validateAuthMiddleware');
-
     app.route('/users')
         .post(userController.createUser)
-        .get(
-            authenticationMiddleware.validateToken,
+        .get(authenticationMiddleware.validateToken,
             permissionMiddleware.verifyAccessPermissions(Constants.permissionLevels.ADMIN),
             userController.getAllUsers);
 

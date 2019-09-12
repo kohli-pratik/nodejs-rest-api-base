@@ -1,12 +1,12 @@
-const mongoose = require('mongoose'),
-    request = require('supertest'),
-    app = require('../../app'),
-    dropCollections = require('./commonMethods').dropCollections;
+const mongoose = require('mongoose');
+const request = require('supertest');
+const app = require('../../app');
+const dropCollections = require('./commonMethods').dropCollections;
 
 let testCategoryId = '';
 
 describe('Testing Category API Calls', () => {
-    afterAll(done => {
+    afterAll((done) => {
         dropCollections(mongoose);
         done();
     });
@@ -39,7 +39,7 @@ describe('Testing Category API Calls', () => {
         expect(response.body).toBeInstanceOf(Array);
         done();
     });
-    
+
     test('Delete Category: should return 200', async (done) => {
         expect.assertions(1);
         const response = await request(app)
@@ -48,11 +48,15 @@ describe('Testing Category API Calls', () => {
         done();
     });
 
-    test('Delete All Categories: should return 200', async (done) => {
+    test('Delete All Categories: should return success or empty datastrore message', async (done) => {
         expect.assertions(1);
         const response = await request(app)
-            .delete(`/categories`);
-        expect(response.status).toBe(200);
+            .delete('/categories');
+        if (response.status === 200) {
+            expect(response.body.message).toBe('All categories successfully deleted');
+        } else if (response.status === 404) {
+            expect(response.body.message).toBe('No categories stored in the database');
+        }
         done();
     });
 });

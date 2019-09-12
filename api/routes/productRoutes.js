@@ -1,9 +1,7 @@
-'use strict';
+const uploadController = require('../controllers/uploadController');
+const productController = require('../controllers/productController');
 
 module.exports = (app) => {
-    const uploadController = require('../controllers/uploadController');
-    const productController = require('../controllers/productController');
-
     app.route('/products')
         .post(uploadController.upload.array('productImage'), productController.addProduct)
         .get(productController.getAllProducts)
@@ -19,4 +17,4 @@ module.exports = (app) => {
 
     app.route('/products/sorted')
         .get(productController.getAllProductsSorted);
-}
+};

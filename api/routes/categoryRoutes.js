@@ -1,8 +1,6 @@
-'use strict';
+const categoryController = require('../controllers/categoryController');
 
 module.exports = (app) => {
-    const categoryController = require('../controllers/categoryController');
-
     app.route('/categories')
         .post(categoryController.createCategory)
         .get(categoryController.getAllCategories)

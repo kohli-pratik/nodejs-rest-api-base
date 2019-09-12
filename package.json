@@ -8,7 +8,8 @@
     "test-user": "jest userAPI.test.js --detectOpenHandles --verbose",
     "test-category": "jest categoryAPI.test.js --detectOpenHandles --verbose",
     "test-product": "jest productAPI.test.js --detectOpenHandles --verbose",
-    "start": "nodemon server.js"
+    "start": "nodemon --exec \"npm run lint && node server.js\"",
+    "lint": "./node_modules/.bin/eslint api/"
   },
   "author": "Pratik H Kohli",
   "license": "ISC",
@@ -19,6 +20,12 @@
     ]
   },
   "devDependencies": {
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react-hooks": "^1.7.0",
     "jest": "^24.9.0",
     "nodemon": "^1.19.1",
     "supertest": "^4.0.2"

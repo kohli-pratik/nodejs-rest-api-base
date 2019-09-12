@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * like body-parser is used to parse json body
  * multer is used to handle multi-part form data
@@ -14,8 +12,8 @@ const storage = multer.diskStorage({
         callback(null, './uploadedFiles/');
     },
     filename: (req, file, callback) => {
-        callback(null, `${new Date().toISOString().replace(/:/g, '-')}_${file.originalname}`)
-    }
+        callback(null, `${new Date().toISOString().replace(/:/g, '-')}_${file.originalname}`);
+    },
 });
 
 /**
@@ -25,7 +23,7 @@ const fileSizeLimit = 1024 * 1024 * 5;
 
 const fileFilter = (req, file, callback) => {
     if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
-        callback(null, true)
+        callback(null, true);
     } else {
         // Invalid file type, Reject file
         callback(new Error(`Invalid file type - ${file.mimetype}`), false);
@@ -33,11 +31,11 @@ const fileFilter = (req, file, callback) => {
 };
 
 const upload = multer({
-    storage: storage,
+    storage,
     limits: {
-        fileSize: fileSizeLimit
+        fileSize: fileSizeLimit,
     },
-    fileFilter: fileFilter
+    fileFilter,
 });
 
 module.exports = { upload };

@@ -1,13 +1,12 @@
-const mongoose = require('mongoose'),
-    request = require('supertest'),
-    app = require('../../app'),
-    dropCollections = require('./commonMethods').dropCollections;
+const mongoose = require('mongoose');
+const request = require('supertest');
+const app = require('../../app');
+const dropCollections = require('./commonMethods').dropCollections;
 
-let testFiles = [],
-    testProductId = '';
+let testProductId = '';
 
 describe('Testing Product API Calls', () => {
-    afterAll(done => {
+    afterAll((done) => {
         dropCollections(mongoose);
         done();
     });
@@ -21,7 +20,6 @@ describe('Testing Product API Calls', () => {
             .field('price', '12.99');
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('_id');
-        testFiles = response.body.images;
         testProductId = response.body._id;
         done();
     });
@@ -29,7 +27,7 @@ describe('Testing Product API Calls', () => {
     test('Get Product: should return 200 and _id', async (done) => {
         expect.assertions(2);
         const response = await request(app)
-            .get(`/products/single/${testProductId}`)
+            .get(`/products/single/${testProductId}`);
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('_id');
         done();
@@ -39,7 +37,7 @@ describe('Testing Product API Calls', () => {
     test('Get All Products: should return 200 and products array', async (done) => {
         expect.assertions(2);
         const response = await request(app)
-            .get('/products')
+            .get('/products');
         expect(response.status).toBe(200);
         expect(response.body).toBeInstanceOf(Array);
         done();
@@ -55,7 +53,6 @@ describe('Testing Product API Calls', () => {
             .field('price', '32.99');
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('_id');
-        testFiles = response.body.images;
         testProductId = response.body._id;
         done();
     });
