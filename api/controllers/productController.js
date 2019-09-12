@@ -14,9 +14,9 @@ exports.addProduct = async (req, res) => {
 
     try {
         const product = await newProduct.save();
-        res.json(product);
+        res.status(200).json(product);
     } catch (err) {
-        res.send(err);
+        res.status(500).send(err);
     }
 };
 
@@ -27,10 +27,10 @@ exports.getProduct = async (req, res) => {
             .populate('category', 'name');
 
         (product === null)
-            ? res.json({ message: `No product with the id ${req.params.productId} exists` })
-            : res.json(product);
+            ? res.status(404).json({ message: `No product with the id ${req.params.productId} exists` })
+            : res.status(200).json(product);
     } catch (err) {
-        res.send(err);
+        res.status(500).send(err);
     }
 };
 
@@ -39,16 +39,16 @@ exports.getAllProducts = async (req, res) => {
         const products = await Product
             .find()
             .populate('category', 'name');
-        res.json(products);
+        res.status(200).json(products);
     } catch (err) {
-        res.send(err);
+        res.status(500).send(err);
     }
 }
 
 exports.getAllProductsFiltered = async (req, res) => {
     try {
         const { filterName } = req.body;
-        let conditions = [];
+        let conditions = {};
 
         switch (filterName) {
             case 'category':
@@ -61,9 +61,10 @@ exports.getAllProductsFiltered = async (req, res) => {
                 break;
         }
         const filteredProducts = await Product.find(conditions);
-        res.json(filteredProducts);
+        res.status(200).json(filteredProducts);
     } catch (err) {
-        res.send(err);
+        console.log('TEST', err);
+        res.status(500).send(err);
     }
 };
 
@@ -82,9 +83,9 @@ exports.getAllProductsSorted = async (req, res) => {
                 sortedProducts = await Product.find({});
                 break;
         }
-        res.json(sortedProducts);
+        res.status(200).json(sortedProducts);
     } catch (err) {
-        res.send(err);
+        res.status(500).send(err);
     }
 };
 
@@ -100,8 +101,8 @@ exports.updateProduct = async (req, res) => {
 
             const deleteOperationResult = deleteFiles(tempStoredImages.map(image => `./${image}`));
             (deleteOperationResult)
-                ? res.json({ message: `No product with the id ${req.params.productId} exists` })
-                : res.send(deleteOperationResult);
+                ? res.status(404).json({ message: `No product with the id ${req.params.productId} exists` })
+                : res.status(500).send(deleteOperationResult);
         } else {
             req.body.images = (req.files)
                 ? [...req.files.map(file => file.path.replace('\\', '/'))]
@@ -110,8 +111,8 @@ exports.updateProduct = async (req, res) => {
             const updatedProduct = await Product.findOneAndUpdate({ _id: req.params.productId }, req.body, { new: true, useFindAndModify: false });
             const deleteOperationResult = deleteFiles(currentProduct.images.map(image => `./${image}`));
             (deleteOperationResult)
-                ? res.json(updatedProduct)
-                : res.send(deleteOperationResult);
+                ? res.status(200).json(updatedProduct)
+                : res.status(500).send(deleteOperationResult);
         }
     } catch (err) {
         res.send(err);
@@ -120,16 +121,18 @@ exports.updateProduct = async (req, res) => {
 
 exports.deleteProduct = async (req, res) => {
     try {
-        const deleteResult = await Product.deleteOne({ _id: req.params.productId });
-        if (deleteResult.deletedCount === 0) {
-            res.status(404).json({ message: `Product with id ${req.params.userId} does not exist` })
+        const product = await Product.findById(req.params.productId);
+        if (product === null) {
+            res.status(404).json({ message: `No product with the id ${req.params.productId} exists` });
         } else {
+            await Product.deleteOne({ _id: req.params.productId });
             // Delete product image files
-            const deleteFileResult = deleteFiles(product.images.map(image => `./${image}`));
+            const deleteFileResult = await deleteFiles(product.images.map(image => `./${image}`));
             (deleteFileResult)
-                ? res.json({ message: `Product ${req.params.productId} successfully deleted` })
-                : res.send(deleteFileResult);
+                ? res.status(200).json({ message: `Product ${req.params.productId} successfully deleted` })
+                : res.status(500).send(deleteFileResult);
         }
+
     } catch (err) {
         res.send(err);
     }
@@ -139,24 +142,23 @@ exports.deleteAllProducts = async (req, res) => {
     try {
         const deleteOperationResult = await Product.deleteMany();
         if (deleteOperationResult.deletedCount === 0) {
-
-            res.json({ message: 'No products stored in the database' })
+            res.status(404).json({ message: 'No products stored in the database' })
         } else {
             // Delete all product image files
             const filePath = `./uploadedFiles`;
             const productImages = fs.readdirSync(filePath);
 
-            const deleteFilesResult = deleteFiles(productImages.map(image => `${filePath}/${image}`));
+            const deleteFilesResult = await deleteFiles(productImages.map(image => `${filePath}/${image}`));
             (deleteFilesResult)
-                ? res.json({ message: `All products successfully deleted` })
-                : res.send(deleteFilesResult);
+                ? res.status(200).json({ message: 'All products successfully deleted' })
+                : res.status(500).send(deleteFilesResult);
         }
     } catch (err) {
         res.send(err);
     }
 };
 
-const deleteFiles = (filePaths) => {
+const deleteFiles = async (filePaths) => {
     filePaths.forEach((filePath) => {
         try {
             fs.unlinkSync(filePath);

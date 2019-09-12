@@ -18,7 +18,7 @@ exports.createUser = async (req, res) => {
         const user = await newUser.save();
         res.status(201).json(user);
     } catch (err) {
-        res.send(err);
+        res.status(500).send(err);
     }
 };
 
@@ -29,9 +29,9 @@ exports.getAllUsers = async (req, res) => {
             ? res.status(404).json({ message: `No users stored in the database` })
             : (parseInt(req.jwt.permissionLevel) !== Constants.permissionLevels.ADMIN)
                 ? res.status(403).send()
-                : res.json(users);
+                : res.status(200).json(users);
     } catch (err) {
-        res.send(err);
+        res.status(500).send(err);
     }
 };
 
@@ -42,9 +42,9 @@ exports.getSingleUser = async (req, res) => {
             ? res.status(404).json({ message: `User with id ${req.params.userId} does not exist` })
             : (user._id != req.jwt.userId)
                 ? res.status(403).send()
-                : res.json(user);
+                : res.status(200).json(user);
     } catch (err) {
-        res.send(err);
+        res.status(500).send(err);
     }
 };
 
@@ -57,10 +57,10 @@ exports.updateUser = async (req, res) => {
         if (updatedUser === null) {
             res.status(404).json({ message: `User with id ${req.params.userId} does not exist` });
         } else {
-            res.json(updatedUser);
+            res.status(200).json(updatedUser);
         }
     } catch (err) {
-        res.send(err);
+        res.status(500).send(err);
     }
 };
 
@@ -69,9 +69,9 @@ exports.deleteUser = async (req, res) => {
         const deleteResult = await User.deleteOne({ _id: req.params.userId });
         (deleteResult.deletedCount === 0)
             ? res.status(404).json({ message: `User with id ${req.params.userId} does not exist` })
-            : res.json({ message: `User with id ${req.params.userId} successfully deleted` });
+            : res.status(200).json({ message: `User with id ${req.params.userId} successfully deleted` });
     } catch (err) {
-        res.send(err);
+        res.status(500).send(err);
     }
 };
 

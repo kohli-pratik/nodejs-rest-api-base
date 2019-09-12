@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --detectOpenHandles --verbose",
+    "test-all": "jest --detectOpenHandles --verbose",
+    "test-user": "jest userAPI.test.js --detectOpenHandles --verbose",
+    "test-category": "jest categoryAPI.test.js --detectOpenHandles --verbose",
+    "test-product": "jest productAPI.test.js --detectOpenHandles --verbose",
     "start": "nodemon server.js"
   },
   "author": "Pratik H Kohli",
