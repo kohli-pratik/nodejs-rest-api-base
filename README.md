@@ -18,6 +18,7 @@ Uses a very simple example of a products catelog to provide examples of the foll
     * Sort as per the sort condition passed in the body.
 * User authentication using JWT tokens
 * API lockdown as per user permissions
+* Express app securing using Helmet to prevent it from being identified as an express app and being open to targeted attacks.
 * Request checks to prevent a user from reading, updating or deleting another user's data unless the requester has Admin level access.
 * Unit testing using Jest to ensure the APIs function as expected given the input and permission level.
 

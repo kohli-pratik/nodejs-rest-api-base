@@ -1,20 +1,25 @@
-var express = require('express'),
-    app = express(),
-    mongoose = require('mongoose'),
-    Category = require('./api/models/categoryModel'), // loading the model
-    Product = require('./api/models/productModel'), // loading the model
-    User = require('./api/models/userModel'), // loading the model
-    bodyParser = require('body-parser');
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const helmet = require('helmet');
+const Category = require('./api/models/categoryModel'); // loading the model
+const Product = require('./api/models/productModel'); // loading the model
+const User = require('./api/models/userModel'); // loading the model
+
+const app = express();
 
 /**
  * mongoose instance connection - url connection
  */
 mongoose.Promise = global.Promise;
-(process.env.NODE_ENV === 'test')
-? mongoose.connect('mongodb://localhost/testStorageDB', { useNewUrlParser: true })
-: mongoose.connect('mongodb://localhost/generalStorageDB', { useNewUrlParser: true });
+if (process.env.NODE_ENV === 'test') {
+    mongoose.connect('mongodb://localhost/testStorageDB', { useNewUrlParser: true });
+} else {
+    mongoose.connect('mongodb://localhost/generalStorageDB', { useNewUrlParser: true });
+}
 
-app.use('/uploadedFiles', express.static('uploadedFiles'))
+app.use(helmet());
+app.use('/uploadedFiles', express.static('uploadedFiles'));
 /**
  * bodyParser parses incoming req bodies in a middleware before the handlers
  * available under the req.body property
@@ -30,6 +35,7 @@ const categoryRoutes = require('./api/routes/categoryRoutes');
 const productRoutes = require('./api/routes/productRoutes');
 const userRoutes = require('./api/routes/userRoutes');
 const authenticationRoutes = require('./api/routes/authenticationRoutes');
+
 categoryRoutes(app);
 productRoutes(app);
 userRoutes(app);
