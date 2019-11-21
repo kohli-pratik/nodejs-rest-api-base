@@ -8,9 +8,9 @@ const testData = {
             permissionLevel: 1,
         },
         {
-            firstName: 'John',
-            lastName: 'Jones',
-            email: 'john.jones@test.com',
+            firstName: 'Bary',
+            lastName: 'Aleen',
+            email: 'barry.allen@test.com',
             password: 'p@$$w0rd',
             permissionLevel: 2,
         },

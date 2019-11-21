@@ -110,7 +110,7 @@ exports.updateProduct = async (req, res) => {
 
         if (currentProduct === null) {
             // Delete the temp saved product image file
-            const tempStoredImages = (req.files)
+            const tempStoredImages = (req.files && req.files.length > 0)
                 ? [...req.files.map((file) => file.path.replace('\\', '/'))]
                 : [];
 
@@ -121,7 +121,7 @@ exports.updateProduct = async (req, res) => {
                 res.status(500).send(deleteOperationResult);
             }
         } else {
-            req.body.images = (req.files)
+            req.body.images = (req.files && req.files.length > 0)
                 ? [...req.files.map((file) => file.path.replace('\\', '/'))]
                 : currentProduct.images;
 

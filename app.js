@@ -2,9 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const Category = require('./api/models/categoryModel'); // loading the model
-const Product = require('./api/models/productModel'); // loading the model
-const User = require('./api/models/userModel'); // loading the model
+
+// Load Models
+require('./api/models/categoryModel');
+require('./api/models/productModel');
+require('./api/models/userModel');
 
 const app = express();
 
