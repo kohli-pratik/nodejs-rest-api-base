@@ -32,6 +32,8 @@ Make sure that you have the following:
 
 To run the project locally, perform the following using the command line
 * Navigate to the project folder
-* If running for the 1st time, install dependencies using ```npm install```
+* If running for the 1st time
+    * install dependencies using ```npm install```
+    * create a folder in the project root directory to store uploaded files. Name the folder "uploadedFiles".
 * Use this command - ```npm start```
     * It will run the server on port 3000

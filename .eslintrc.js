@@ -1,6 +1,5 @@
 module.exports = {
   env: {
-    commonjs: true,
     es6: true,
     node: true,
     jest: true,
@@ -13,7 +12,7 @@ module.exports = {
     SharedArrayBuffer: 'readonly', // es2017 added globals
   },
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaVersion: 2020,
   },
   rules: {
     'indent': ['error', 4, {'SwitchCase': 1}],
