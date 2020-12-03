@@ -15,9 +15,9 @@ const app = express();
  */
 mongoose.Promise = global.Promise;
 if (process.env.NODE_ENV === 'test') {
-    mongoose.connect('mongodb://localhost/testStorageDB', { useNewUrlParser: true });
+    mongoose.connect('mongodb://localhost/testStorageDB', { useNewUrlParser: true, useUnifiedTopology: true });
 } else {
-    mongoose.connect('mongodb://localhost/generalStorageDB', { useNewUrlParser: true });
+    mongoose.connect('mongodb://localhost/generalStorageDB', { useNewUrlParser: true, useUnifiedTopology: true });
 }
 
 app.use(helmet());

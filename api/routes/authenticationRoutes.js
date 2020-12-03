@@ -6,6 +6,6 @@ module.exports = (app) => {
         .post(
             verifyUserMiddleware.validateFields,
             verifyUserMiddleware.validateCredentials,
-            authenticationController.authenticate
+            authenticationController.authenticate,
         );
 };

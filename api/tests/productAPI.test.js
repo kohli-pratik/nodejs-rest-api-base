@@ -33,7 +33,6 @@ describe('Testing Product API Calls', () => {
         done();
     });
 
-
     test('Get All Products: should return 200 and products array', async (done) => {
         expect.assertions(2);
         const response = await request(app)
